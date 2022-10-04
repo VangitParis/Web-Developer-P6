@@ -1,6 +1,9 @@
+//Récupérer le shéma des sauces
 const Sauce = require('../models/sauce');
+//fonction pour supprimer une sauce
 const fs = require('fs');
 
+//Ctrl post pour créer une sauce = router.post('/', auth, multer, sauceCtrl.createSauce);
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
@@ -17,6 +20,7 @@ exports.createSauce = (req, res, next) => {
     .catch(error => { res.status(400).json({ error }) })
 };
 
+//Ctrl post pour liker une sauce = router.post('/:id/like', auth, sauceCtrl.like);
 exports.like = (req, res, next) => {
   console.log('récupérer la req.body');
   /*requête envoyée sous format JSON contenant les proprités userId et like dans Postman ou depuis l'url port 3000
@@ -136,6 +140,8 @@ exports.like = (req, res, next) => {
 
 };
 
+
+//Ctrl get pour récupérer une sauce = router.get('/:id', auth, sauceCtrl.getOneSauce);
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({
     _id: req.params.id
@@ -152,6 +158,7 @@ exports.getOneSauce = (req, res, next) => {
   );
 };
 
+//Ctrl put pour modifier une sauce = router.put('/:id', auth, multer, sauceCtrl.modifySauce);
 exports.modifySauce = (req, res, next) => {
   const sauceObject = req.file ? {
     ...JSON.parse(req.body.sauce),
@@ -161,10 +168,10 @@ exports.modifySauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
-        res.status(401).json({ message: 'Not authorized' });
+        res.status(401).json({ message: 'Non autorisé' });
       } else {
         Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-          .then(() => res.status(200).json({ message: 'Objet modifié!' }))
+          .then(() => res.status(200).json({ message: ' Sauce modifiée !' }))
           .catch(error => res.status(401).json({ error }));
       }
     })
@@ -173,13 +180,15 @@ exports.modifySauce = (req, res, next) => {
     });
 };
 
+//Ctrl delete pour récupérer une sauce = router.delete('/:id', auth, sauceCtrl.deleteSauce);
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
       if (sauce.userId != req.auth.userId) {
-        res.status(403).json({ message: 'Not authorized' });
+        res.status(403).json({ message: 'Non autorisé' });
       } else {
         const filename = sauce.imageUrl.split('/images/')[1];
+        //supprimer l'image avec fs unlick de multer
         fs.unlink(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
             .then(() => { res.status(200).json({ message: 'Sauce supprimée !' }) })
@@ -193,7 +202,7 @@ exports.deleteSauce = (req, res, next) => {
 };
 
 
-
+//Ctrl get pour récupérer toutes les sauces = router.get('/', auth, sauceCtrl.getAllSauces);
 exports.getAllSauces = (req, res) => {
   Sauce.find()
     .then((sauces) => {

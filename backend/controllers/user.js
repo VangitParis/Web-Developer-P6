@@ -4,6 +4,7 @@ const User = require('../models/User');
 
 
 exports.signup = (req, res, next) => {
+    //utilisation de bcrypt pour crypté le mot de passe 
     bcrypt.hash(req.body.password, 10,)
         .then(hash => {
             const user = new User({
