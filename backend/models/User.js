@@ -7,6 +7,7 @@ const userSchema = mongoose.Schema({
   password: { type: String, required: true }
 });
 
+// plugin moongoose garantie l'unicité des adresses mails dans la base de données
 userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('User', userSchema);

@@ -1,4 +1,4 @@
-//----AJOUTER LE SHEMA A LA BADE DE DONNEES MONGODB
+//----AJOUTER LE SHEMA A LA BASE DE DONNEES MONGODB
 
 const mongoose = require('mongoose');
 

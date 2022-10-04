@@ -2,6 +2,8 @@
 const express = require('express');
 //Ajout de la base de données MongoDB
 const mongoose = require('mongoose');
+//masquer les données de mongoDB
+var mongoMask = require('mongo-mask')
 
 const app = express();
 //path pour les images depuis multer
