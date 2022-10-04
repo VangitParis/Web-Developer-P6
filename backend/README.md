@@ -2,6 +2,7 @@
 # HOT TAKES Backend #
 ## Installation ##
 Clonez ce repo, et faire run `npm install` depuis le répertoire du projet.
+https://github.com/VangitParis/Web-Developer-P6.git
 
 ## Utilisation de l'application ##
 Exécutez `npm start` depuis le répertoire frontend du projet.
