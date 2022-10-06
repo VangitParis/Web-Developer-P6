@@ -45,7 +45,7 @@ exports.like = (req, res, next) => {
 
       //Condition si l'user like la sauce, si userLiked est false (=userId n'est pas dans le tableau)
       // et si like === 1
-      if (!sauce.usersLiked.includes(req.auth.userId) && (req.body.like === 1)) {
+      if (!sauce.usersLiked.includes(req.auth.userId) && (req.body.like === 1))  {
         console.log("userId n'est pas dans le tableau usersLiked et likes = 1");
 
         //màj sauce dans bdd mongoDB
@@ -71,7 +71,7 @@ exports.like = (req, res, next) => {
 
       if (sauce.usersLiked.includes(req.body.userId) && (req.body.like === 0)) {
         console.log("userId est dans le tableau usersLiked ET likes = 0");
-
+       
         //màj sauce dans bdd
         Sauce.updateOne(
           { _id: req.params.id },

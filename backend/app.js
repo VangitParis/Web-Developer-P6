@@ -1,9 +1,9 @@
 //Ajout express à l'application
 const express = require('express');
 //Ajout de la base de données MongoDB
-const mongoose = require('mongoose');
-//masquer les données de mongoDB
-var mongoMask = require('mongo-mask')
+const mongoose = require('./.env/mongoose');
+
+
 
 const app = express();
 //path pour les images depuis multer
@@ -25,11 +25,11 @@ app.use((req, res, next) => {
   app.use(express.json());
 
 //compte mongoose = accès à la base de données 
-mongoose.connect('mongodb+srv://VanG:piq13sauce*@cluster0.iumkbc8.mongodb.net/?retryWrites=true&w=majority',
+/*mongoose.connect('mongodb+srv://VanG:piq13sauce*@cluster0.iumkbc8.mongodb.net/?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
+  .catch(() => console.log('Connexion à MongoDB échouée !'));*/
 
 
 
@@ -41,5 +41,6 @@ mongoose.connect('mongodb+srv://VanG:piq13sauce*@cluster0.iumkbc8.mongodb.net/?r
 app.use('/api/sauces', saucesRoutes);
 app.use('/api/auth', userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
+
 
 module.exports = app;
