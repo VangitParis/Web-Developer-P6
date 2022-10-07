@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const { response } = require('../app');
 
 
 exports.signup = (req, res, next) => {
@@ -13,7 +14,8 @@ exports.signup = (req, res, next) => {
             });
             user.save()
                 .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-                .catch(error => res.status(400).json({ error }));
+                .catch(error => res.status(400).json({ error })), console.log('Utilisateur déjà créé !');
+
         })
         .catch(error => res.status(500).json({ error }));
 };
@@ -22,8 +24,8 @@ exports.login = (req, res, next) => {
     User.findOne({ email: req.body.email })
         .then(user => {
             if (!user) {
-                console.log('Utilisateur Inconnu');
-                return res.status(401).json({ error: ' Utilisateur Inconnu !' });
+                console.log('Utilisateur Inconnu !');
+                return res.status(401).json({ error : 'Utilisateur Inconnu !' });
             }
             bcrypt.compare(req.body.password, user.password)
                 .then(valid => {

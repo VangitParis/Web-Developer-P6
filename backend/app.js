@@ -1,9 +1,8 @@
+//const  dotenv  =  require ( 'dotenv' ) 
 //Ajout express à l'application
 const express = require('express');
 //Ajout de la base de données MongoDB
-const mongoose = require('./.env/mongoose');
-
-
+const mongoose = require('./mongoose');
 
 const app = express();
 //path pour les images depuis multer
