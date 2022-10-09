@@ -1,5 +1,6 @@
 //Récupérer le shéma des sauces
 const Sauce = require('../models/sauce');
+const auth = require('../middleware/auth');
 //fonction pour supprimer une sauce
 const fs = require('fs');
 
@@ -16,7 +17,7 @@ exports.createSauce = (req, res, next) => {
     usersDisliked: []
   });
   sauce.save()
-    .then(() => { res.status(201).json({ message: 'Objet enregistré !' }) })
+    .then(() => { res.status(201).json({ message: 'Sauce créée !' }) })
     .catch(error => { res.status(400).json({ error }) })
 };
 
@@ -31,10 +32,13 @@ exports.like = (req, res, next) => {
 */
   console.log(userId = req.body.like);
 
-  //récupérer l'id dans l'url de la req body
+  //récupérer l'id dans l'url de la req body (= contenu de la sauce)
   console.log('récupérer la req.params');
   console.log(req.params);
   console.log({ _id: req.params.id });
+  console.log({ _userId: req.auth.userId });
+
+
 
   //récupérer la sauce sélectionnée dans la bdd
   Sauce.findOne({ _id: req.params.id })
@@ -43,89 +47,105 @@ exports.like = (req, res, next) => {
       console.log(sauce);
       //-------------like = 1 (like = +1)
 
-      //Condition si l'user like la sauce, si userLiked est false (=userId n'est pas dans le tableau)
-      // et si like === 1
-      if (!sauce.usersLiked.includes(req.auth.userId) && (req.body.like === 1))  {
-        console.log("userId n'est pas dans le tableau usersLiked et likes = 1");
 
-        //màj sauce dans bdd mongoDB
-        Sauce.updateOne(
-          //on récup id de la sauce 
-          { _id: req.params.id },
-          //méthode $inc = incrémenter la valeur à 1
-          {
-            $inc: { likes: 1 },
-            //méthode $push = pousser l'userId dans le tableau 
-            $push: { usersLiked: req.body.userId }
-          })
-          //réponse reçue de la promise
-          .then(() => res.status(201).json({ message: 'userId a liké la sauce ' })
+      //mise en place d'un switch case() pour les cas où l'userId like, ne like pas ou dislike
+      switch (req.body.like) {
+        case 1:
+          //Condition si l'user like la sauce, si userLiked est false (=userId n'est pas dans le tableau)
+          // et si like === 1
+          if (!sauce.usersLiked.includes(req.body.userId) && (req.body.like === 1)) {
+            //console.log((!userId.req.auth));
+            console.log("userId n'est pas dans le tableau usersLiked et likes = 1");
 
-          )
-          .catch(error => { res.status(400).json({ error }) });
+            //màj sauce dans bdd mongoDB
+            Sauce.updateOne(
+              //on récup id de la sauce 
+              { _id: req.params.id },
+              //méthode $inc = incrémenter la valeur à 1
+              {
+                $inc: { likes: 1 },
+                //méthode $push = pousser l'userId dans le tableau 
+                $push: { usersLiked: req.body.userId }
+              })
+              //réponse reçue de la promise
+              .then(() => res.status(201).json({ message: 'userId a liké la sauce ' })
 
-      };
+              )
+              .catch(error => { res.status(400).json({ error }), console.log('userId inconnu'); });
 
-      //Condition si l'user ne like pas la sauce, si userLiked est true (= userId est dans le tableau)
-      // et like === 0 (likes = -1)
+          }
+          break;
 
-      if (sauce.usersLiked.includes(req.body.userId) && (req.body.like === 0)) {
-        console.log("userId est dans le tableau usersLiked ET likes = 0");
-       
-        //màj sauce dans bdd
-        Sauce.updateOne(
-          { _id: req.params.id },
-          {
-            //retirer le vote existant méthode $inc = incrémenter la valeur à -1 
-            $inc: { likes: -1 },
-            //méthode $pull = enlever userId du tableau
-            $pull: { usersLiked: req.body.userId }
-          })
-          .then(() => res.status(201).json({ message: "userId n'a pas liké la sauce OU a enlevé son like ET like = 0" })
+        case 0:
+          //Condition si l'user ne like pas la sauce, si userLiked est true (= userId est dans le tableau)
+          // et like === 0 (likes = -1)
 
-          )
-          .catch(error => { res.status(400).json({ error }) });
+          if (sauce.usersLiked.includes(req.body.userId) && (req.body.like === 0)) {
+            console.log("userId est dans le tableau usersLiked ET likes = 0");
 
-      };
+            //màj sauce dans bdd
+            Sauce.updateOne(
+              { _id: req.params.id },
+              {
+                //retirer le vote existant méthode $inc = incrémenter la valeur à -1 
+                $inc: { likes: -1 },
+                //méthode $pull = enlever userId du tableau
+                $pull: { usersLiked: req.body.userId }
+              })
+              .then(() => res.status(201).json({ message: "userId n'a pas liké la sauce OU a enlevé son like ET like = 0" })
 
-      //Condition si l'user dislike la sauce, si userDisliked est true (= userId est dans le tableau)
-      //like === -1 (dislikes = +1)
-      if (!sauce.usersDisliked.includes(req.auth.userId) && (req.body.like === -1)) {
-        console.log("userId n'est pas dans le tableau usersDisliked ET dislikes = 1 ET like = -1");
+              )
+              .catch(error => { res.status(400).json({ error }), console.log('userId inconnu'); });
 
-        //màj sauce dans bdd
-        Sauce.updateOne(
-          { _id: req.params.id },
-          {
-            $inc: { dislikes: 1 },
-            $push: { usersDisliked: req.body.userId }
-          })
-          .then(() => res.status(201).json({ message: 'userId a disliké la sauce ' })
+          };
+          
+          //Si l'user a disliké (dislikes = 1), il faut remettre dislikes à 0 si il enlève son dislike (=> dislikes = 0 )
+          if (sauce.usersDisliked.includes(req.body.userId) && (req.body.like === 0)) {
+            console.log("userId est dans le tableau usersDisliked ET dislikes = 0");
 
-          )
-          .catch(error => { res.status(400).json({ error }) });
+            //màj sauce dans bdd
+            Sauce.updateOne(
+              { _id: req.params.id },
+              {
+                //retirer le vote existant 
+                $inc: { dislikes: -1 },
+                //enlever userId du tableau userDisliked
+                $pull: { usersDisliked: req.body.userId }
+              })
+              .then(() => res.status(201).json({ message: "userId n'a pas disliké la sauce OU a enlevé son dislike ET dislike = 0" })
 
-      };
+              )
+              .catch(error => {
+                res.status(400).json({ error })
+              });
 
-      //Si l'user a disliké (dislikes = 1), il faut remettre dislikes à 0 si il enlève son dislike (=> dislikes = 0 )
-      if (sauce.usersDisliked.includes(req.body.userId) && (req.body.like === 0)) {
-        console.log("userId est dans le tableau usersDisliked ET dislikes = 0");
+          };
+          break;
 
-        //màj sauce dans bdd
-        Sauce.updateOne(
-          { _id: req.params.id },
-          {
-            //retirer le vote existant 
-            $inc: { dislikes: -1 },
-            //enlever userId du tableau userDisliked
-            $pull: { usersDisliked: req.body.userId }
-          })
-          .then(() => res.status(201).json({ message: "userId n'a pas disliké la sauce OU a enlevé son dislike ET dislike = 0" })
 
-          )
-          .catch(error => { res.status(400).json({ error }) });
+        //Condition si l'user dislike la sauce, si userDisliked est true (= userId est dans le tableau)
+        //like === -1 (dislikes = +1)
+        case -1:
+          if (!sauce.usersDisliked.includes(req.body.userId) && (req.body.like === -1)) {
+            console.log("userId n'est pas dans le tableau usersDisliked ET dislikes = 1 ET like = -1");
 
-      };
+            //màj sauce dans bdd
+            Sauce.updateOne(
+              { _id: req.params.id },
+              {
+                $inc: { dislikes: 1 },
+                $push: { usersDisliked: req.body.userId }
+              })
+              .then(() => res.status(201).json({ message: 'userId a disliké la sauce ' })
+
+              )
+              .catch(error => { res.status(400).json({ error }), console.log('userId inconnu'); });
+
+          };
+
+          break;
+      }
+
 
     })
     .catch(
@@ -168,7 +188,7 @@ exports.modifySauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
-        res.status(401).json({ message: 'Non autorisé' });
+        res.status(403).json({ message: "Non autorisé car userID n'est pas propriétaire de la sauce" }), console.log("erreur 403 : MODIF NON AUTORISÉE car userID n'est pas propriétaire de la sauce");
       } else {
         Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
           .then(() => res.status(200).json({ message: ' Sauce modifiée !' }))
@@ -185,13 +205,13 @@ exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
       if (sauce.userId != req.auth.userId) {
-        res.status(403).json({ message: 'Non autorisé' });
+        res.status(403).json({ message: "Non autorisé car userID n'est pas propriétaire de la sauce" }), console.log("erreur 403 : SUPPRESSION NON AUTORISÉE car userID n'est pas propriétaire de la sauce");
       } else {
         const filename = sauce.imageUrl.split('/images/')[1];
         //supprimer l'image avec fs unlick de multer
         fs.unlink(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
-            .then(() => { res.status(200).json({ message: 'Sauce supprimée !' }) })
+            .then(() => { res.status(200).json({ message: 'Sauce supprimée !' }), console.log("l'userID a supprimé sa sauce"); })
             .catch(error => res.status(401).json({ error }));
         });
       }

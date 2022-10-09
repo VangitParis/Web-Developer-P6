@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
-const { response } = require('../app');
+//const { response } = require('../app');
 require('dotenv').config(); 
 
 
@@ -36,6 +36,7 @@ exports.login = (req, res, next) => {
                     }
                     res.status(200).json({
                         userId: user._id,
+                        //On utilise la methode sign de jwt pour chiffrer un nouveau token : dans ce token on a l'Id de l 'utilisateur qui sera le payload (=données encodées dans le token)
                         token: jwt.sign(
                             { userId: user._id },
                             process.env.SECRET_TOKEN,
