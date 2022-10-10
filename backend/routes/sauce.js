@@ -4,9 +4,10 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
+//appel de la const crtl pour accéder aux routes sauces
 const sauceCtrl = require('../controllers/sauce');
 
-
+//le router donne accès à notre API après authentification
 router.get('/', auth, sauceCtrl.getAllSauces);
 router.post('/', auth, multer, sauceCtrl.createSauce);
 router.get('/:id', auth, sauceCtrl.getOneSauce);

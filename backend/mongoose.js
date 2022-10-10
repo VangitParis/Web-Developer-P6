@@ -1,4 +1,7 @@
-require('dotenv').config(); 
+//appel du fichier .env
+require('dotenv').config();
+
+
 //compte mongoose = accès à la base de données 
 const mongoose = require('mongoose');
 const my_db_key = process.env.DB_KEY

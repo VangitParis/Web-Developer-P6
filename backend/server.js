@@ -1,9 +1,10 @@
 //Appel de la variable du fichier .env
-require('dotenv').config(); 
+require('dotenv').config();
+
 const http = require('http');
 const app = require('./app');
 
-
+//fonction normalize qui renvoi un port valide 
 const normalizePort = val => {
   const port = parseInt(val, 10);
 
@@ -18,6 +19,7 @@ const normalizePort = val => {
 const PORT = normalizePort(process.env.PORT);
 app.set('port', PORT);
 
+//gestion des erreurs 
 const errorHandler = error => {
   if (error.syscall !== 'listen') {
     throw error;
@@ -38,8 +40,8 @@ const errorHandler = error => {
   }
 };
 
-const server = http.createServer(app);
 
+const server = http.createServer(app);
 server.on('error', errorHandler);
 server.on('listening', () => {
   const address = server.address();
@@ -47,5 +49,5 @@ server.on('listening', () => {
   console.log('Listening on ' + bind);
 });
 
-//ecoouter le server 
+//ecouter le server 
 server.listen(PORT, () => { console.log(`Server is listening on port: ${PORT}`); });

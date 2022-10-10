@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
-//const { response } = require('../app');
-require('dotenv').config(); 
+
+
+require('dotenv').config();
 
 
 exports.signup = (req, res, next) => {
@@ -15,19 +16,22 @@ exports.signup = (req, res, next) => {
             });
             user.save()
                 .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-                .catch(error => res.status(400).json({ error })), console.log('Utilisateur déjà créé !');
+                .catch(error => { res.status(400).json({ error : 'Utilisateur déjà créé !' })});
 
         })
         .catch(error => res.status(500).json({ error }));
+        
 };
 
 exports.login = (req, res, next) => {
+    //recherche dans la bdd grâce à findOne()
     User.findOne({ email: req.body.email })
         .then(user => {
             if (!user) {
                 console.log('Utilisateur Inconnu !');
-                return res.status(401).json({ error : 'Utilisateur Inconnu !' });
+                return res.status(401).json({ error: 'Utilisateur Inconnu !' });
             }
+            //comparer les mots de passe
             bcrypt.compare(req.body.password, user.password)
                 .then(valid => {
                     if (!valid) {
@@ -45,8 +49,12 @@ exports.login = (req, res, next) => {
                     });
                 })
                 .catch(error => res.status(500).json({ error }));
+                
+
         })
         .catch(error => res.status(500).json({ error }));
 
 };
+
+
 
