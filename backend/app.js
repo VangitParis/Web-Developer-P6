@@ -7,7 +7,7 @@ const session = require("cookie-session");
 //Ajout de la sécurité helmet pour l'app express
 const helmet = require("helmet");
 //Ajout de la base de données MongoDB
-const mongoose = require('./mongoose');
+const mongoose = require('./db/mongoose');
 //création de l'application Express
 const app = express();
 //path pour les images depuis multer
@@ -39,6 +39,7 @@ saveUnititilized : true, //Respect RGPD consentement
 
 
 app.use(express.json());
+//autoriser certaines app à communiquer avec notre Api grâce aux hearders cors
 app.use(cors());
 //les requêtes passent par le middleware helmet
 app.use(helmet());

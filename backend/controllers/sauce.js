@@ -130,12 +130,12 @@ exports.like = (req, res, next) => {
 
             };
             break;
-          
+
           //like = -1
           case -1:
             //Condition si l'user dislike la sauce, si userDisliked est true (= userId est dans le tableau)
             //like === -1 (dislikes = +1)
-           
+
             if (!sauce.usersDisliked.includes(req.body.userId) && (req.body.like === -1) && (!sauce.usersLiked.includes(req.body.userId))) {
               console.log("userId n'est pas dans le tableau usersDisliked ET n'est pas dans le tableau usersLiked ET dislikes = 1 ET like = -1");
 
@@ -152,9 +152,10 @@ exports.like = (req, res, next) => {
                 .catch(error => { console.log('Utilisateur non autorisé'); res.status(401).json({ error }) });
 
             } else { res.status(401).json({ error: 'Utilisateur a déjà voté !' }) };
-            
+
             break;
-        }})
+        }
+      })
       .catch(
         (error) => {
           res.status(404).json({
@@ -163,7 +164,7 @@ exports.like = (req, res, next) => {
         }
       );
 
-  } else { res.status(401).json({ error: 'Utilisateur Inconnu !' })};
+  } else { res.status(401).json({ error: 'Utilisateur Inconnu !' }) };
 };
 
 
@@ -192,7 +193,8 @@ exports.modifySauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
-        res.status(403).json({ message: "Non autorisé car userID n'est pas propriétaire de la sauce" }), console.log("erreur 403 : MODIF NON AUTORISÉE car userID n'est pas propriétaire de la sauce");
+        res.status(403).json({ message: "Non autorisé car userID n'est pas propriétaire de la sauce" }),
+          console.log("erreur 403 : MODIF NON AUTORISÉE car userID n'est pas propriétaire de la sauce");
       } else {
         Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
           .then(() => res.status(200).json({ message: ' Sauce modifiée !' }))
@@ -209,7 +211,8 @@ exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
       if (sauce.userId != req.auth.userId) {
-        res.status(403).json({ message: "Non autorisé car userID n'est pas propriétaire de la sauce" }), console.log("erreur 403 : SUPPRESSION NON AUTORISÉE car userID n'est pas propriétaire de la sauce");
+        res.status(403).json({ message: "Non autorisé car userID n'est pas propriétaire de la sauce" }),
+         console.log("erreur 403 : SUPPRESSION NON AUTORISÉE car userID n'est pas propriétaire de la sauce");
       } else {
         const filename = sauce.imageUrl.split('/images/')[1];
         //supprimer l'image avec fs unlick de multer
@@ -218,6 +221,7 @@ exports.deleteSauce = (req, res, next) => {
             .then(() => { res.status(200).json({ message: 'Sauce supprimée !' }), console.log("l'userID a supprimé sa sauce"); })
             .catch(error => res.status(401).json({ error }));
         });
+        next();
       }
     })
     .catch(error => {
