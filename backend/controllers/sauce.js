@@ -197,7 +197,7 @@ exports.modifySauce = (req, res, next) => {
           console.log("erreur 403 : MODIF NON AUTORISÉE car userID n'est pas propriétaire de la sauce");
       } else {
         Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-          .then(() => res.status(200).json({ message: ' Sauce modifiée !' }))
+          .then(() => res.status(200).json({ message: ' Sauce modifiée !' }), console.log("l'userID a modifié sa sauce") )
           .catch(error => res.status(401).json({ error }));
       }
     })
@@ -221,7 +221,6 @@ exports.deleteSauce = (req, res, next) => {
             .then(() => { res.status(200).json({ message: 'Sauce supprimée !' }), console.log("l'userID a supprimé sa sauce"); })
             .catch(error => res.status(401).json({ error }));
         });
-        next();
       }
     })
     .catch(error => {
