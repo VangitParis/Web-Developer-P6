@@ -24,7 +24,7 @@ module.exports = (req,res, next) => {
         // => true
     }else
     // Récupère une liste complète des règles qui ont échouées 
-    return console.log('mot de passe trop faible ! '), 
+    return console.log(' Mot de passe trop faible ! '), 
     res.status(400).json({error : `mot de passe faible 
     ${passwordSchema.validate('req.body.password',{list:true})}` })
     // => [ 'min', 'maj', 'chiffres' ]

@@ -20,5 +20,6 @@ const storage = multer.diskStorage({
     callback(null, name + Date.now() + '.' + extension);
   }
 });
-//création d'un middleware avec la fonction single() qui capture les fichiers d'un certain type et les enregistre au système de fichiers du seveur à l'aide du storage 
+//création d'un middleware avec la fonction single() qui capture les fichiers d'un certain type et 
+//les enregistre au système de fichiers du seveur à l'aide du storage 
 module.exports = multer({ storage: storage }).single('image');

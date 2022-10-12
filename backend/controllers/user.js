@@ -10,7 +10,7 @@ const User = require('../models/User');
 
 
 exports.signup = (req, res, next) => {
-    //chiffrer email avat de l'envoyer à la bdd
+    //chiffrer email avant de l'envoyer à la bdd
     const emailCryptoJs = crypto.HmacSHA256(req.body.email,
          `${process.env.SECRET_EMAIL}`).toString();
     
@@ -32,10 +32,10 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-    //recherche dans la bdd grâce à findOne()
     //chiffrer email avat de l'envoyer à la bdd
     const emailCryptoJs = crypto.HmacSHA256(req.body.email,
         `${process.env.SECRET_EMAIL}`).toString();
+         //recherche dans la bdd grâce à findOne()
     User.findOne({email : emailCryptoJs  })
         .then(user => {
             if (!user) {

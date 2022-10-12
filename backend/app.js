@@ -17,10 +17,6 @@ const path = require('path');
 const userRoutes = require('./routes/user');
 const saucesRoutes = require('./routes/sauce');
 
-
-
-
-
 const expireDate = new Date(Date.now()+ 60 * 60 * 1000 )//1 heure de session 
 app.use(session({ 
   name: 'session',
